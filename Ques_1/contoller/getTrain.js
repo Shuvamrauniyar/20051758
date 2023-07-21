@@ -1,14 +1,9 @@
 const axios = require('axios');
 const dotenv = require('dotenv');
 dotenv.config();
+
 const bodyParser = require('body-parser');
-
-const token = process.env.TOKEN;
-const headers = {
-    Authorization: `Bearer ${token}`,
-  };
-
-const apiURL = 'http://20.244.56.144/train/trains';
+const {getToken} = require('./getToken');
 
 async function sortTrains(trains) {
     try {
@@ -43,17 +38,21 @@ async function sortTrains(trains) {
 
 const getOrderedTrain = async(req,res) => {
     try {
-        let Trains = await axios.get(apiURL,{headers});
+         //the expiry of token was very less so for interval of some time i needed to again authenticate the user , so only fo temporary, i embeded the auth api here 
+         //itself to get the new token and fetch the flight 
+            const token =  await getToken();
+            console.log(token);
 
-    //    Trains= Json.stringify(Trains);
-       
+            const headers = {
+                Authorization: `Bearer ${token}`,
+            };
+
+          const apiURL = 'http://20.244.56.144/train/trains';
+           let Trains = await axios.get(apiURL,{headers});
+
         //console.log(Trains.data);
         console.log('-------------------------')
-        console.log('-------------------------')
-        console.log('-------------------------')
-        console.log('-------------------------')
-        console.log('-------------------------')
-        console.log('-------------------------')
+
         const sortedTrains = await sortTrains(Trains.data);
         console.log('sortedtrain list-----',sortedTrains);
         return res.status(200).json({
